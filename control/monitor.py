@@ -46,6 +46,8 @@ def analyze_data():
         city = item['station__location__city__name']
         user = item['station__user__username']
 
+        print(datetime.now(), "Check Value, variable, max, min {} {} {} {}".format(item["check_value"], variable, max_value, min_value ))
+
         if item["check_value"] > max_value or item["check_value"] < min_value:
             alert = True
 
