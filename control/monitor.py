@@ -75,6 +75,13 @@ def on_disconnect(client: mqtt.Client, userdata, rc):
     print("Reconectando...")
     client.reconnect()
 
+def on_publish(client, userdata, result):
+    print("Publish successful!")
+    pass
+
+def on_error(client, userdata, rc):
+    print("Connection failed!", rc)
+    pass
 
 def setup_mqtt():
     '''
@@ -84,17 +91,13 @@ def setup_mqtt():
     print("Iniciando cliente MQTT...", settings.MQTT_HOST, settings.MQTT_PORT)
     global client
     try:
-        client = mqtt.Client(settings.MQTT_USER_PUB)
-        client.on_connect = on_connect
-        client.on_disconnect = on_disconnect
-
-        if settings.MQTT_USE_TLS:
-            client.tls_set(ca_certs=settings.CA_CRT_PATH,
-                           tls_version=ssl.PROTOCOL_TLSv1_2, cert_reqs=ssl.CERT_NONE)
-
         client.username_pw_set(settings.MQTT_USER_PUB,
                                settings.MQTT_PASSWORD_PUB)
-        client.connect(settings.MQTT_HOST, settings.MQTT_PORT)
+        client.on_connect = on_connect
+        client.on_publish = on_publish
+        client.on_connect_fail = on_error
+        client.on_disconnect = on_disconnect
+        client.connect(settings.MQTT_HOST, settings.MQTT_PORT, 60)
 
     except Exception as e:
         print('Ocurrió un error al conectar con el bróker MQTT:', e)
@@ -105,7 +108,7 @@ def start_cron():
     Inicia el cron que se encarga de ejecutar la función analyze_data cada 5 minutos.
     '''
     print("Iniciando cron...")
-    schedule.every(5).minutes.do(analyze_data)
+    schedule.every(1).minutes.do(analyze_data)
     print("Servicio de control iniciado")
     while 1:
         schedule.run_pending()
