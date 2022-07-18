@@ -47,34 +47,35 @@ def on_message(client: mqtt.Client, userdata, message: mqtt.MQTTMessage):
 
 
 def on_connect(client, userdata, flags, rc):
-    print("Suscribiendo al tópico: " + settings.TOPIC)
-    client.subscribe(settings.TOPIC)
-    print("Servicio de recepcion de datos iniciado")
+    print("Connection:", mqtt.connack_string(rc))
+    client.subscribe("#", qos=1)
+    pass
 
 
-def on_disconnect(client: mqtt.Client, userdata, rc):
-    '''
-    Función que se ejecuta cuando se desconecta del broker.
-    Intenta reconectar al bróker.
-    '''
-    print("Desconectado con mensaje:" + str(mqtt.connack_string(rc)))
-    print("Reconectando...")
-    client.reconnect()
+def on_disconnect(client, userdata, rc):
+    print("Disconnected:", mqtt.connack_string(rc))
+    pass
 
+def on_log(client, userdata, level, buf):
+    print("Log: ", buf)
+    pass
 
 print("Iniciando cliente MQTT...", settings.MQTT_HOST, settings.MQTT_PORT)
 try:
-    client = mqtt.Client(settings.MQTT_USER)
-    client.on_connect = on_connect
-    client.on_message = on_message
-    client.on_disconnect = on_disconnect
-
-    if settings.MQTT_USE_TLS:
-        client.tls_set(ca_certs=settings.CA_CRT_PATH,
-                       tls_version=ssl.PROTOCOL_TLSv1_2, cert_reqs=ssl.CERT_NONE)
-
+    client = mqtt.Client(settings.TOPIC)
     client.username_pw_set(settings.MQTT_USER, settings.MQTT_PASSWORD)
-    client.connect(settings.MQTT_HOST, settings.MQTT_PORT)
+    client.on_message = on_message
+    client.on_connect = on_connect
+    client.on_connect_fail = on_connect
+    client.on_disconnect = on_disconnect
+    client.connect(settings.MQTT_HOST, settings.MQTT_PORT, 60)
+    client.loop_forever()
+
+   # if settings.MQTT_USE_TLS:
+    #    client.tls_set(ca_certs=settings.CA_CRT_PATH,
+     #                  tls_version=ssl.PROTOCOL_TLSv1_2, cert_reqs=ssl.CERT_NONE)
+
+
 
 except Exception as e:
     print('Ocurrió un error al conectar con el bróker MQTT:', e)
