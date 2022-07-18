@@ -62,6 +62,7 @@ def on_log(client, userdata, level, buf):
 
 print("Iniciando cliente MQTT...", settings.MQTT_HOST, settings.MQTT_PORT)
 try:
+    # ------[  # INCLUIDO RETO 6]
     client = mqtt.Client(settings.TOPIC)
     client.username_pw_set(settings.MQTT_USER, settings.MQTT_PASSWORD)
     client.on_message = on_message

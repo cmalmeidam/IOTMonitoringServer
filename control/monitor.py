@@ -95,6 +95,7 @@ def setup_mqtt():
     print("Iniciando cliente MQTT...", settings.MQTT_HOST, settings.MQTT_PORT)
     global client
     try:
+        # ------[  # INCLUIDO RETO 6]
         client.username_pw_set(settings.MQTT_USER_PUB,
                                settings.MQTT_PASSWORD_PUB)
         client.on_connect = on_connect
