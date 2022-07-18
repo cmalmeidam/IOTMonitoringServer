@@ -48,7 +48,7 @@ def on_message(client: mqtt.Client, userdata, message: mqtt.MQTTMessage):
 
 def on_connect(client, userdata, flags, rc):
     print("Connection:", mqtt.connack_string(rc))
-    client.subscribe("#", qos=1)
+    client.subscribe(settings.TOPIC, qos=1)
     pass
 
 
