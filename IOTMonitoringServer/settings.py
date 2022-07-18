@@ -161,8 +161,8 @@ MQTT_HOST = "54.89.127.162"
 MQTT_PORT = 8082
 
 # Credenciales para el usuario suscriptor del bróker MQTT
-MQTT_USER = "user1"
-MQTT_PASSWORD = "123456"
+MQTT_USER = "admin"
+MQTT_PASSWORD = "admin"
 
 # Credenciales para el usuario publicador del bróker MQTT
 MQTT_USER_PUB = "admin2"
