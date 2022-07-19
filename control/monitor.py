@@ -16,9 +16,7 @@ def analyze_data():
     # Consulta todos los datos de la última hora, los agrupa por estación y variable
     # Compara el promedio con los valores límite que están en la base de datos para esa variable.
     # Si el promedio se excede de los límites, se envia un mensaje de alerta.
-
     print("Calculando alertas...")
-
     data = Data.objects.filter(
         base_time__gte=datetime.now() - timedelta(hours=1))
     aggregation = data.annotate(check_value=Avg('avg_value')) \
@@ -36,21 +34,16 @@ def analyze_data():
     alerts = 0
     for item in aggregation:
         alert = False
-
         variable = item["measurement__name"]
         max_value = item["measurement__max_value"] or 0
         min_value = item["measurement__min_value"] or 0
-
         country = item['station__location__country__name']
         state = item['station__location__state__name']
         city = item['station__location__city__name']
         user = item['station__user__username']
-
         print(datetime.now(), "Check Value, variable, max, min {} {} {} {}".format(item["check_value"], variable, max_value, min_value ))
-
         if item["check_value"] > max_value or item["check_value"] < min_value:
             alert = True
-
         if alert:
             message = "ALERT {} {} {}".format(variable, min_value, max_value)
             #topic = '{}/{}/{}/{}/in'.format(country, state, city, user)
@@ -58,7 +51,6 @@ def analyze_data():
             print(datetime.now(), "Sending alert to {} {}".format(topic, variable))
             client.publish(topic, message)
             alerts += 1
-
     print(len(aggregation), "dispositivos revisados")
     print(alerts, "alertas enviadas")
 
